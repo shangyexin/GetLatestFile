@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>450</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
+      <y>350</y>
       <width>574</width>
       <height>71</height>
      </rect>
@@ -71,7 +71,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>360</y>
+      <y>410</y>
       <width>581</width>
       <height>41</height>
      </rect>
@@ -100,44 +100,18 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>100</y>
       <width>571</width>
-      <height>241</height>
+      <height>261</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>551</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>源文件夹：</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>目标文件夹：</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_4">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>160</width>
+      <width>121</width>
       <height>31</height>
      </rect>
     </property>
@@ -158,12 +132,32 @@
      </item>
     </layout>
    </widget>
-   <zorder>horizontalLayoutWidget</zorder>
-   <zorder>horizontalLayoutWidget_2</zorder>
-   <zorder>textBrowser</zorder>
-   <zorder>horizontalLayoutWidget_3</zorder>
-   <zorder>horizontalLayoutWidget_4</zorder>
-   <zorder>label_2</zorder>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>571</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>源文件夹：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>目标文件夹：</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -172,7 +166,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -180,7 +174,6 @@
      <string>文件</string>
     </property>
     <addaction name="file_open"/>
-    <addaction name="file_save"/>
     <addaction name="file_close"/>
     <addaction name="separator"/>
     <addaction name="file_set"/>
@@ -198,17 +191,12 @@
   </widget>
   <action name="file_open">
    <property name="text">
-    <string>打开</string>
-   </property>
-  </action>
-  <action name="file_save">
-   <property name="text">
-    <string>关闭</string>
+    <string>打开配置</string>
    </property>
   </action>
   <action name="file_close">
    <property name="text">
-    <string>保存</string>
+    <string>保存配置</string>
    </property>
   </action>
   <action name="file_set">
@@ -247,28 +235,12 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>537</x>
-     <y>368</y>
+     <x>582</x>
+     <y>415</y>
     </hint>
     <hint type="destinationlabel">
      <x>483</x>
      <y>380</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>469</x>
-     <y>373</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>593</x>
-     <y>401</y>
     </hint>
    </hints>
   </connection>
