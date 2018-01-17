@@ -17,7 +17,8 @@
    <string>最新文件获取小工具</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="picture\download.png"/>
+   <iconset theme="picture\download.png">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -127,7 +128,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="project_name_label">
        <property name="text">
         <string>202S-B</string>
        </property>
@@ -146,14 +147,14 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="src_floder_label">
        <property name="text">
         <string>源文件夹：</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="dst_floder_label">
        <property name="text">
         <string>目标文件夹：</string>
        </property>
@@ -169,7 +170,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
