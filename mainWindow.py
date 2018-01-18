@@ -4,9 +4,9 @@
 # @time   : 2018/1/15 14:42
 # @File   : mainWindow.py
 
-import sys, os, shutil, logging
+import sys, os, shutil, logging, time
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QApplication)
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import (QThread, pyqtSignal)
 from Ui_mainWindow import Ui_MainWindow
 
 logging.basicConfig(level=logging.DEBUG,
@@ -70,23 +70,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.output_log('目标文件夹未设置!')
             #TODO
         else:
-            #start_copy(self.src_folder_path, self.dst_folder_path)
-            start_thread = function(self)
-            start_thread.start()
-           # start_thread.run()
-            start_thread.start_copy(self.src_folder_path, self.dst_folder_path)
-            #start_thread.exec_()
+            # 把按钮禁用掉
+            self.ui.start_button.setDisabled(True)
+            # 新建对象，传入参数
+            self.start_thread = function(self.src_folder_path, self.dst_folder_path)
+            # 连接子进程的信号和槽函数
+            self.start_thread.finishSignal.connect(self.start_copy_end)
+            self.start_thread.start()
+
+    def start_copy_end(self, result):
+        print('receive end signal')
+        print(result)
+        # 恢复按钮
+        self.ui.start_button.setDisabled(False)
+
 
     #输出log到GUI文本框
     def output_log(self, str):
         self.ui.textBrowser.append(str)
 
 class function(QThread):
-    def __init__(self, parent=None):
+    # 声明一个信号，同时返回一个str
+    finishSignal = pyqtSignal(str)
+    # 构造函数里增加形参
+    def __init__(self, src_d, dst_d, parent=None):
         super(function, self).__init__(parent)
+        # 储存参数
+        self.src_folder = src_d
+        self.dst_folder = dst_d
 
     def run(self):
         print('this is a thread')
+        print(self.src_folder)
+        print(self.dst_folder)
+        self.start_copy(self.src_folder, self.dst_folder)
+        self.finishSignal.emit('ok')
 
     # 检查源文件夹
     def check_src_dir(self, project_dir):
