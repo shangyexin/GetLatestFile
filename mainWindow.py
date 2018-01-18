@@ -4,7 +4,7 @@
 # @time   : 2018/1/15 14:42
 # @File   : mainWindow.py
 
-import sys, os, shutil, logging, time
+import sys, os, shutil, logging, configparser, time
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QApplication)
 from PyQt5.QtCore import (QThread, pyqtSignal)
 from Ui_mainWindow import Ui_MainWindow
@@ -15,20 +15,34 @@ logging.basicConfig(level=logging.DEBUG,
                     )
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+    project_name = None
     src_folder_path = None
     dst_folder_path = None
 
     def __init__(self, parent=None):
         super(MainWindow, self).__init__()
+        self.conf = configure()
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        #从配置文件中读取源文件和目标文件路径并进行显示
+        src_str_prefix = '源文件夹： '
+        self.src_folder_path = self.conf.get_src_folder_path()
+        src_str = src_str_prefix + self.src_folder_path
+        self.ui.src_floder_label.setText(src_str)
+        dst_str_prefix = '目标文件夹： '
+        self.dst_folder_path = self.conf.get_dst_folder_path()
+        dst_str = dst_str_prefix + self.dst_folder_path
+        self.ui.dst_floder_label.setText(dst_str)
+
         self.ui.file_quit.triggered.connect(self.close)
         self.ui.help_abut.triggered.connect(self.on_help_about_clicked)
 
         self.ui.set_src_button.clicked.connect(self.set_src_button_cliked)
         self.ui.set_des_button.clicked.connect(self.set_dst_button_cliked)
         self.ui.start_button.clicked.connect(self.start_button_cliked)
+
 
     #‘关于’菜单
     def on_help_about_clicked(self):
@@ -45,6 +59,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             src_str_prefix = '源文件夹： '
             src_str = src_str_prefix + self.src_folder_path
             self.ui.src_floder_label.setText(src_str)
+            # 写入配置文件
+            try:
+                self.conf.set_src_folder_path(self.src_folder_path)
+            except Exception as e:
+                print(e)
         else:
             self.output_log('未设置目标文件夹')
 
@@ -57,6 +76,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             dst_str_prefix = '目标文件夹： '
             dst_str = dst_str_prefix + self.dst_folder_path
             self.ui.dst_floder_label.setText(dst_str)
+            #写入配置文件
+            try:
+                self.conf.set_dst_folder_path(self.dst_folder_path)
+            except Exception as e:
+                print(e)
         else:
             self.output_log('未设置目标文件夹')
 
@@ -78,16 +102,86 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.start_thread.finishSignal.connect(self.start_copy_end)
             self.start_thread.start()
 
+    #start 按钮结束
     def start_copy_end(self, result):
         print('receive end signal')
         print(result)
         # 恢复按钮
         self.ui.start_button.setDisabled(False)
 
-
     #输出log到GUI文本框
     def output_log(self, str):
         self.ui.textBrowser.append(str)
+
+class configure():
+    home_path = None
+    project_name = None
+    src_folder_path = None
+    dst_folder_path = None
+    config_file_name = 'default.ini'
+
+    def __init__(self):
+        self.home_path = os.path.expandvars('%USERPROFILE%')
+        os.chdir(self.home_path)
+        self.conf = configparser.ConfigParser()
+        try:
+            self.conf.read(self.config_file_name)
+            self.check_config()
+            print('check config success!')
+        except Exception as e:
+            print(e)
+            self.create_blank_config_file()
+
+    def create_blank_config_file(self):
+        os.chdir(self.home_path)
+        # add section / set option & key
+        self.conf.add_section("project_name")
+        self.conf.set("project_name", "project_name", "")
+        self.conf.add_section("folder_path")
+        self.conf.set("folder_path", "src_folder_path", "")
+        self.conf.set("folder_path", "dst_folder_path", "")
+        # write to file
+        with open("default.ini", "w+") as f_config:
+            self.conf.write(f_config)
+
+    def get_project_name(self):
+        return self.project_name
+
+    def set_project_name(self, user_set_project_name):
+        os.chdir(self.home_path)
+
+        self.conf.set("project_name", "project_name", user_set_project_name)
+        with open("default.ini", "w") as f_config:
+            self.conf.write(f_config)
+
+    def get_src_folder_path(self):
+        print('call get_src_folder_path')
+        return self.src_folder_path
+
+    #在配置文件中更新源文件夹路径
+    def set_src_folder_path(self, user_set_dst_path):
+        os.chdir(self.home_path)
+        self.conf.set("folder_path", "src_folder_path", user_set_dst_path)
+        #写回配置文件
+        with open("default.ini", "w") as f_config:
+            self.conf.write(f_config)
+
+    def get_dst_folder_path(self):
+        return self.dst_folder_path
+
+    # 在配置文件中更新目标文件夹路径
+    def set_dst_folder_path(self, user_set_dst_path):
+        os.chdir(self.home_path)
+        self.conf.set("folder_path", "dst_folder_path", user_set_dst_path)
+        # 写回配置文件
+        with open("default.ini", "w") as f_config:
+            self.conf.write(f_config)
+
+    def check_config(self):
+        self.project_name = self.conf.get("project_name","project_name")
+        self.src_folder_path = self.conf.get("folder_path", "src_folder_path")
+        print('self.src_folder_path is ',self.src_folder_path)
+        self.dst_folder_path = self.conf.get("folder_path", "dst_folder_path")
 
 class function(QThread):
     # 声明一个信号，同时返回一个str
