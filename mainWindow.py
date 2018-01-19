@@ -5,7 +5,7 @@
 # @File   : mainWindow.py
 
 import sys, os, shutil, logging, configparser, time
-from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QApplication)
+from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QApplication, QInputDialog)
 from PyQt5.QtCore import (QThread, pyqtSignal)
 from Ui_mainWindow import Ui_MainWindow
 
@@ -22,23 +22,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__()
         self.conf = configure()
-
+        self.setFixedSize(600, 500)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         #从配置文件中读取源文件和目标文件路径并进行显示
-        src_str_prefix = '源文件夹： '
-        self.src_folder_path = self.conf.get_src_folder_path()
-        src_str = src_str_prefix + self.src_folder_path
-        self.ui.src_floder_label.setText(src_str)
-        dst_str_prefix = '目标文件夹： '
-        self.dst_folder_path = self.conf.get_dst_folder_path()
-        dst_str = dst_str_prefix + self.dst_folder_path
-        self.ui.dst_floder_label.setText(dst_str)
+        self.read_config_file()
 
+        #设置菜单栏
+        self.ui.file_set.triggered.connect(self.file_set_cliked)
         self.ui.file_quit.triggered.connect(self.close)
         self.ui.help_abut.triggered.connect(self.on_help_about_clicked)
 
+        #设置按钮
         self.ui.set_src_button.clicked.connect(self.set_src_button_cliked)
         self.ui.set_des_button.clicked.connect(self.set_dst_button_cliked)
         self.ui.start_button.clicked.connect(self.start_button_cliked)
@@ -49,6 +45,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         info = 'About'
         print(info)
         self.ui.textBrowser.append(info)
+
+    def file_set_cliked(self):
+        self.project_name, ok = QInputDialog.getText(self, '设置',
+                                        '请输入项目名称:')
+        if ok:
+            #修改项目名称显示
+            self.ui.project_name_label.setText(self.project_name)
+            # 写入配置文件
+            try:
+                self.conf.set_project_name(self.project_name)
+            except Exception as e:
+                print(e)
+
 
     #‘设置源文件夹’按钮
     def set_src_button_cliked(self):
@@ -87,10 +96,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #‘开始’按钮
     def start_button_cliked(self):
         #print('start button cliked')
-        if(self.src_folder_path == None):
+        if(self.src_folder_path == None or self.src_folder_path == ''):
             self.output_log('源文件未设置!')
             # TODO
-        elif(self.dst_folder_path == None):
+        elif(self.dst_folder_path == None or self.dst_folder_path == '' ):
             self.output_log('目标文件夹未设置!')
             #TODO
         else:
@@ -112,6 +121,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #输出log到GUI文本框
     def output_log(self, str):
         self.ui.textBrowser.append(str)
+
+    def read_config_file(self):
+        #读取项目名称
+        self.project_name = self.conf.get_project_name()
+        if (self.project_name!=None):
+            self.ui.project_name_label.setText(self.project_name)
+        else:
+            self.ui.project_name_label.setText('默认名称')
+        #读取源文件夹路径
+        src_str_prefix = '源文件夹： '
+        self.src_folder_path = self.conf.get_src_folder_path()
+        if (self.src_folder_path != None):
+            src_str = src_str_prefix + self.src_folder_path
+            self.ui.src_floder_label.setText(src_str)
+        # 读取目标文件夹路径
+        dst_str_prefix = '目标文件夹： '
+        self.dst_folder_path = self.conf.get_dst_folder_path()
+        if (self.dst_folder_path != None):
+            dst_str = dst_str_prefix + self.dst_folder_path
+            self.ui.dst_floder_label.setText(dst_str)
 
 class configure():
     home_path = None
