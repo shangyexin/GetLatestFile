@@ -85,8 +85,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #‘设置源文件夹’按钮
     def set_src_button_cliked(self):
         # self.output_log('click set src folder button')
-        self.src_folder_path = QFileDialog.getExistingDirectory(self, '选取文件夹', '/home')
-        if self.src_folder_path:
+        self.src_folder_path_get = QFileDialog.getExistingDirectory(self, '选取文件夹', '/home')
+        if self.src_folder_path_get:
+            self.src_folder_path = self.src_folder_path_get
             self.output_log('设置源文件成功')
             src_str_prefix = '源文件夹： '
             src_str = src_str_prefix + self.src_folder_path
@@ -97,13 +98,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except Exception as e:
                 logging.debug(e)
         else:
-            self.output_log('未设置目标文件夹')
+            self.output_log('未设置源文件夹')
 
     #‘设置目标文件夹’按钮
     def set_dst_button_cliked(self):
         #self.output_log('click set dest folder button')
-        self.dst_folder_path = QFileDialog.getExistingDirectory(self, '选取文件夹', '/home')
-        if self.dst_folder_path:
+        self.dst_folder_path_get = QFileDialog.getExistingDirectory(self, '选取文件夹', '/home')
+        if self.dst_folder_path_get:
+            self.dst_folder_path = self.dst_folder_path_get
             self.output_log('设置目标文件成功')
             dst_str_prefix = '目标文件夹： '
             dst_str = dst_str_prefix + self.dst_folder_path
@@ -120,7 +122,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def del_old_button_clicked(self):
         self.output_log('点击删除旧文件按钮')
         reply = QMessageBox.warning(self, '警告',
-                                     '您的操作会删除目标文件夹内所有旧目录和文件，只保留最新的一个文件或文件夹，请确认是否删除？',
+                                     '您的操作会删除目标文件夹内所有旧目录和文件，只保留最新的一个文件或文件夹，'
+                                     '请确认是否删除？',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if (reply == QMessageBox.Yes):
             self.output_log('确认删除旧文件')
@@ -238,7 +241,7 @@ class configure():
         try:
             self.conf.read(self.config_file_name)
             self.check_config()
-            logging.debug(':check config success!')
+            logging.debug('check config file success!')
         except Exception as e:
             logging.debug(e)
             self.create_blank_config_file()
@@ -354,12 +357,6 @@ class function(QThread):
 
         self.finish_signal.emit('end_with_success')
 
-    # last_object = self.get_latest_dir(self.src_folder)
-    # if(os.path.isdir(last_object)):
-    #     pass
-    # else:
-    #     return
-
     # 检查文件夹
     def check_dir(self, dir):
             logging.debug('project dir set by user is %s' % dir)
@@ -379,7 +376,6 @@ class function(QThread):
                 return False
 
         return True
-
 
     # 拷贝文件夹至文件夹并显示进度
     def copy_dir_with_proress(self, src_dir, dst_dir):
