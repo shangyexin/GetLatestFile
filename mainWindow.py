@@ -4,7 +4,7 @@
 # @time   : 2018/1/15 14:42
 # @File   : mainWindow.py
 
-import sys, os, shutil, logging, configparser, time
+import sys, os, shutil, logging, configparser, time, subprocess
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QApplication, QInputDialog, QMessageBox)
 from PyQt5.QtCore import (QThread, pyqtSignal)
 from Ui_mainWindow import Ui_MainWindow
@@ -31,33 +31,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #从配置文件中读取源文件和目标文件路径并进行显示
         self.read_config_file()
 
-        #设置菜单栏
-        self.ui.file_set.triggered.connect(self.file_set_cliked)
+        #菜单栏
+        self.ui.file_open.triggered.connect(self.on_file_open_clicked)
+        self.ui.file_save.triggered.connect(self.on_file_save_clicked)
+        self.ui.file_set.triggered.connect(self.on_file_set_cliked)
         self.ui.file_quit.triggered.connect(self.close)
         self.ui.help_help.triggered.connect(self.on_help_help_clicked)
         self.ui.help_abut.triggered.connect(self.on_help_about_clicked)
 
-        #设置按钮
+        #按钮
         self.ui.set_src_button.clicked.connect(self.set_src_button_cliked)
         self.ui.set_des_button.clicked.connect(self.set_dst_button_cliked)
         self.ui.del_old_button.clicked.connect(self.del_old_button_clicked)
         self.ui.start_button.clicked.connect(self.start_button_cliked)
 
-    # 'help' 菜单
-    def on_help_help_clicked(self):
-        QMessageBox.about(self, '使用说明',
-                          '本软件可以将源文件夹中的最新文件夹复制到目标文件夹，'
-                          '一般用于一键下载项目中的最新升级包至本地目录')
+    # '打开配置'菜单
+    def on_file_open_clicked(self):
+        self.output_log('打开配置文件')
+        pass
 
-    #‘关于’菜单
-    def on_help_about_clicked(self):
-        QMessageBox.about(self, '关于',
-                                  'version：0.1'
-                                  '\n' 
-                                  'author: yasin')
+    # '保存配置'菜单
+    def on_file_save_clicked(self):
+        self.output_log('保存配置文件')
+        pass
 
     # '设置' 菜单
-    def file_set_cliked(self):
+    def on_file_set_cliked(self):
         self.project_name, ok = QInputDialog.getText(self, '设置',
                                         '请输入项目名称:')
         if ok:
@@ -70,6 +69,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except Exception as e:
                 logging.debug(e)
 
+    # 'help' 菜单
+    def on_help_help_clicked(self):
+        QMessageBox.about(self, '使用说明',
+                          '本软件可以将源文件夹中的最新文件夹复制到目标文件夹，'
+                          '一般用于一键下载项目中的最新升级包至本地目录')
+
+     #‘关于’菜单
+    def on_help_about_clicked(self):
+        QMessageBox.about(self, '关于',
+                          'version：0.1'
+                          '\n'
+                          'author: yasin')
 
     #‘设置源文件夹’按钮
     def set_src_button_cliked(self):
@@ -107,7 +118,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # '删除旧文件'按钮
     def del_old_button_clicked(self):
-        self.ui.progressBar.setValue(100)
+        self.output_log('点击删除旧文件按钮')
+        reply = QMessageBox.warning(self, '警告',
+                                     '您的操作会删除目标文件夹内所有旧目录和文件，只保留最新的一个文件或文件夹，请确认是否删除？',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if (reply == QMessageBox.Yes):
+            self.output_log('确认删除旧文件')
+            try:
+                if(delete_all_old(self.dst_folder_path)):
+                    self.output_log('删除成功！')
+            except Exception as e:
+                logging.error(e)
+        else:
+            pass
 
     #‘开始’按钮
     def start_button_cliked(self):
@@ -164,8 +187,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 logging.error(e)
         elif(result == 'end_with_success'):
             self.ui.progressBar.setValue(100)
-            logging.debug(self.dst_folder_path)
-           # QFileDialog.directoryEntered(self.dst_folder_path)
+            abs_path = os.path.abspath(get_latest_object(self.dst_folder_path))
+            self.open_cmd = 'explorer.exe ' + abs_path
+            logging.debug(self.open_cmd)
+            try:
+                subprocess.Popen(self.open_cmd)
+            except Exception as e:
+                logging.error(e)
 
             self.output_log('下载完成！')
 
@@ -390,7 +418,6 @@ class function(QThread):
         self.progress = value
         self.progress_signal.emit(self.progress)
 
-
 #计算进度线程，实际上不停的获取目标文件夹大小，除以源文件夹大小，返回结果
 class calculate_progress(QThread):
     # 声明一个进度信号，返回int型执行进度
@@ -430,13 +457,30 @@ class calculate_progress(QThread):
         self.complete_flag = True
 
 # 获取项目文件夹内最新文件或文件夹
-def get_latest_object(project_dir):
-    lists = os.listdir(project_dir)  # 列出目录的下所有文件和文件夹保存到lists
+def get_latest_object(dir):
+    lists = os.listdir(dir)  # 列出目录的下所有文件和文件夹保存到lists
     logging.debug(list)
-    lists.sort(key=lambda fn: os.path.getmtime(project_dir + "\\" + fn))  # 按时间排序
-    object_latest = os.path.join(project_dir, lists[-1])  # 获取最新的文件保存到object_latest
+    lists.sort(key=lambda fn: os.path.getmtime(dir + "\\" + fn))  # 按时间排序
+    object_latest = os.path.join(dir, lists[-1])  # 获取最新的文件保存到object_latest
     logging.debug(object_latest)
     return object_latest
+
+# 删除文件夹内所有旧文件，只保留最新的文件或文件夹
+def delete_all_old(dir):
+    lists = os.listdir(dir)  # 列出目录的下所有文件和文件夹保存到lists
+    # logging.debug(lists)
+    lists.sort(key=lambda fn: os.path.getmtime(dir + "\\" + fn))  # 按时间排序
+    for files in lists[0:-1]:
+        files_abs_path = os.path.join(dir, files)
+        # logging.debug(files_abs_path)
+        if(os.path.isfile(files_abs_path)):
+            os.remove(files_abs_path)
+        elif(os.path.isdir(files_abs_path)):
+            shutil.rmtree(files_abs_path)
+        else:
+            logging.debug('both not:')
+            logging.debug(files_abs_path)
+    return True
 
 # 获取文件夹内所有文件大小
 def getdirsize(dir):
