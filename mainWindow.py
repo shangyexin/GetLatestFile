@@ -42,6 +42,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #按钮
         self.ui.set_src_button.clicked.connect(self.set_src_button_cliked)
         self.ui.set_des_button.clicked.connect(self.set_dst_button_cliked)
+        self.ui.open_dst_button.clicked.connect(self.open_dst_button_cliked)
         self.ui.del_old_button.clicked.connect(self.del_old_button_clicked)
         self.ui.start_button.clicked.connect(self.start_button_cliked)
 
@@ -117,6 +118,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 logging.debug(e)
         else:
             self.output_log('未设置目标文件夹')
+
+    # ‘打开目标文件夹按钮
+    def open_dst_button_cliked(self):
+        abs_path = os.path.abspath(self.dst_folder_path)
+        open_dst_cmd =  'explorer.exe ' + abs_path
+        logging.debug(open_dst_cmd)
+        try:
+            subprocess.Popen(open_dst_cmd)
+        except Exception as e:
+            logging.error(e)
 
     # '删除旧文件'按钮
     def del_old_button_clicked(self):

@@ -26,13 +26,13 @@
      <rect>
       <x>10</x>
       <y>350</y>
-      <width>574</width>
+      <width>591</width>
       <height>71</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
-      <number>20</number>
+      <number>15</number>
      </property>
      <item>
       <widget class="QPushButton" name="set_src_button">
@@ -49,7 +49,17 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="open_dst_button">
+       <property name="text">
+        <string>打开目标文件夹</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="del_old_button">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#ffffff;&quot;&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; font-weight:600; color:#008080;&quot;&gt;该操作会删除目标文件夹内所有旧目录和文件，只保留最新的一个文件或文件夹，且无法恢复，请确认您已经正确理解该按钮的意思后再使用。&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>删除旧文件</string>
        </property>
@@ -115,8 +125,8 @@
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>571</width>
-      <height>51</height>
+      <width>581</width>
+      <height>61</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
