@@ -201,8 +201,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 logging.error(e)
         elif(result == 'end_with_success'):
             self.ui.progressBar.setValue(100)
-            abs_path = os.path.abspath(get_latest_object(self.dst_folder_path))
-            self.open_cmd = 'explorer.exe ' + abs_path
+            dir_name = os.path.split(get_latest_object(self.src_folder_path))[1]
+            logging.debug(dir_name)
+            dst_dir_abs = os.path.abspath(self.dst_folder_path)
+            abs_dir_path = os.path.join(dst_dir_abs, dir_name)
+            self.open_cmd = 'explorer.exe ' + abs_dir_path
             logging.debug(self.open_cmd)
             try:
                 subprocess.Popen(self.open_cmd)
@@ -272,6 +275,7 @@ class configure():
     def get_project_name(self):
         return self.project_name
 
+    # 在配置文件中更新项目名称
     def set_project_name(self, user_set_project_name):
         os.chdir(self.home_path)
 
@@ -392,18 +396,18 @@ class function(QThread):
     def copy_dir_with_proress(self, src_dir, dst_dir):
         logging.debug(src_dir)
         logging.debug(dst_dir)
+        logging.debug('start copytree')
+        dir_name = os.path.split(src_dir)[1]
+        logging.debug(dir_name)
+        abs_dir_path = os.path.join(dst_dir, dir_name)
+        logging.debug(abs_dir_path)
         # 启动计算进度线程
-        cal_thread = calculate_progress(src_dir, dst_dir)
+        cal_thread = calculate_progress(src_dir, abs_dir_path)
         cal_thread.progress_signal.connect(self.set_progress)
         cal_thread.start()
 
         #复制目录
         try:
-            logging.debug('start copytree')
-            dir_name = os.path.split(src_dir)[1]
-            logging.debug(dir_name)
-            abs_dir_path = os.path.join(dst_dir, dir_name)
-            logging.debug(abs_dir_path)
             shutil.copytree(src_dir, abs_dir_path)
             logging.debug('end copytree')
             #TODO

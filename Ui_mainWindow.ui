@@ -17,8 +17,8 @@
    <string>最新文件获取小工具</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>picture/download.png</normaloff>picture/download.png</iconset>
+   <iconset resource="picture/picture.qrc">
+    <normaloff>:/logo/download.ico</normaloff>:/logo/download.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -57,9 +57,6 @@
      </item>
      <item>
       <widget class="QPushButton" name="del_old_button">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#ffffff;&quot;&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; font-weight:600; color:#008080;&quot;&gt;该操作会删除目标文件夹内所有旧目录和文件，只保留最新的一个文件或文件夹，且无法恢复，请确认您已经正确理解该按钮的意思后再使用。&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
        <property name="text">
         <string>删除旧文件</string>
        </property>
@@ -248,7 +245,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="picture/picture.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>quit_button</sender>
