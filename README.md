@@ -1,7 +1,8 @@
 # 软件用法介绍：
 
 <b>使用pyinstaller.exe打包的exe程序，在dist目录，可以直接在Windows下运行，可以不用环境直接看到最终效果</b>
-
+  
+  下载地址：https://yasin.store/index.php/s/SW86lxUGZs3oBbH
 ## 主界面：
 ![](picture/main.png)
 
